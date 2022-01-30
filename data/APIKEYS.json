@@ -1,0 +1,13 @@
+{
+    "twitter": {
+        "key": "",
+        "seret": "",
+        "bearertoken": "",
+        "accesstoken": "",
+        "accesstokensecret": ""
+    },
+    "reddit": {
+        "id": "",
+        "secret": ""
+    }
+}

@@ -1,0 +1,5 @@
+python-binance~=1.0.10
+asyncio
+pandas
+tqdm
+feedparser
