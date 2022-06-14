@@ -26,6 +26,8 @@ if path_exist == True:
 else:
     makedirs(f"./Data/Crypto/{start_date}")
 
+datapath = f"./Data/Crypto/{start_date}"
+
 retreived = []
 for root, dirs, files in walk(f"./Data/Crypto/"):
     for name in files:
@@ -39,8 +41,10 @@ for root, dirs, files in walk(f"./Data/Crypto/"):
 API_KEY = ""
 SECRET_KEY = ""
 
-unwanted = ["EUR", "GBP", "AED", "ARS", "AUD", "BRL", "CAD", "CHF", "CZK", "DKK", "GHS", "HKD", "HUF", "JPY", "KES", "KZT", "KES", "KZT", "MXN", "NGN", "NOK", "NZD", "PEN", "PLN", "RUB", "SEK", "TRY", "UAH", "UGX", "VND", "ZAR", "PAX", "SUSDT", "BUSD", "TUSD", "USDC", "USDSB", "USDP", "USDS", "SUSD", "USDSB"]
+unwanted3 = [ "AUD", "BRL", "EUR", "GBP", "RUB", "TRY", "DAI", "UAH", "VAI", "NGN", "BNB", "BTC", "ETH", "XRP", "DOT" ]
+unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE" ]
 wanted4 = ["USDT"]
+
 open_connections = 0
 
 async def main():
@@ -57,7 +61,7 @@ async def main():
     shuffle(symbols)
     for symbol in symbols:
         s = symbol["symbol"]
-        if s not in retreived and s[-4:] in wanted4 and s[:-4] not in unwanted:
+        if s not in retreived and s[-4:] == wanted4[0] and s[-6:-4] != "UP" and s[-8:-4] != "DOWN":
             tickers.append(s)
 
     print(len(tickers))
