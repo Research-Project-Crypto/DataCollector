@@ -1,5 +1,4 @@
-python-binance~=1.0.10
+python-binance~=1.0.12
 asyncio
 pandas
 tqdm
-feedparser

@@ -4,6 +4,7 @@ from binance import AsyncClient,ThreadedWebsocketManager
 import csv
 from datetime import date
 import pandas as pd
+from tqdm import tqdm
 from random import shuffle
 
 start_date = date.today()
@@ -42,7 +43,7 @@ API_KEY = ""
 SECRET_KEY = ""
 
 unwanted3 = [ "AUD", "BRL", "EUR", "GBP", "RUB", "TRY", "DAI", "UAH", "VAI", "NGN", "BNB", "BTC", "ETH", "XRP", "DOT" ]
-unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE" ]
+unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE", "DOWN", "BULL", "BEAR"]
 wanted4 = ["USDT"]
 
 open_connections = 0
@@ -61,21 +62,21 @@ async def main():
     shuffle(symbols)
     for symbol in symbols:
         s = symbol["symbol"]
-        if s not in retreived and s[-4:] == wanted4[0] and s[-6:-4] != "UP" and s[-8:-4] != "DOWN":
+        if s not in retreived and s[-4:] == wanted4[0] and s[-6:-4] != "UP" and s[-8:-4] not in unwanted4:
             tickers.append(s)
 
     print(len(tickers))
-    for s in tickers:
+    for s in tqdm(tickers):
             if path.isfile(f'./Data/Crypto/{start_date}/{s}.csv'):
                 fileEmpty = stat(f'./Data/Crypto/{start_date}/{s}.csv').st_size == 0
                 if fileEmpty:
                     asyncio.create_task(get_coin(s))
                     open_connections += 1
-                    await asyncio.sleep(200)
+                    await asyncio.sleep(10)
             else:
                 asyncio.create_task(get_coin(s))
                 open_connections += 1
-                await asyncio.sleep(200)
+                await asyncio.sleep(10)
 
     while True:
         await asyncio.sleep(1)
@@ -84,13 +85,13 @@ async def get_coin(s):
     global open_connections
     global client
     global streams
-    print(f'get {s}')
-    print(f'open connections: {open_connections}')
+    # print(f'get {s}')
+    # print(f'open connections: {open_connections}')
     try:
         candles = await client.get_historical_klines(s, interval = AsyncClient.KLINE_INTERVAL_1MINUTE, start_str = '100000000 minutes ago CET', end_str = '1 minutes ago CET')
-        print(f'got {s}')
+        # print(f'got {s}')
         open_connections -= 1
-        print(f'open connections: {open_connections}')
+        # print(f'open connections: {open_connections}')
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, write_coin, s, candles)
     except Exception as e:
@@ -98,7 +99,7 @@ async def get_coin(s):
 
 def write_coin(s, candles):
     global streams
-    print('start writing')
+    # print('start writing')
     with open(f'./Data/Crypto/{start_date}/{s}.csv', mode='a',newline='') as csv_file:
         writer = csv.writer(csv_file, dialect="unix")
         writer.writerow(["event_time","open", "close", "high", "low","volume"])
