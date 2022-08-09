@@ -8,10 +8,10 @@ from tqdm import tqdm
 from random import shuffle
 
 start_date = date.today()
-path_exist = path.exists(f"./Data/Crypto/{start_date}")
+path_exist = path.exists(f"./Data/Crypto/")
 if path_exist == True:
     print('cleaning...')
-    for root, dirs, files in walk(f"./Data/Crypto/{start_date}"):
+    for root, dirs, files in walk(f"./Data/Crypto/"):
         for name in files:
             try:
                 df = pd.read_csv(path.join(root, name), error_bad_lines=False)
@@ -25,9 +25,9 @@ if path_exist == True:
                 print(str(e))
     print('done cleaning')
 else:
-    makedirs(f"./Data/Crypto/{start_date}")
+    makedirs(f"./Data/Crypto/")
 
-datapath = f"./Data/Crypto/{start_date}"
+datapath = f"./Data/Crypto/"
 
 retreived = []
 for root, dirs, files in walk(f"./Data/Crypto/"):
@@ -42,8 +42,8 @@ for root, dirs, files in walk(f"./Data/Crypto/"):
 API_KEY = ""
 SECRET_KEY = ""
 
-unwanted3 = [ "AUD", "BRL", "EUR", "GBP", "RUB", "TRY", "DAI", "UAH", "VAI", "NGN", "BNB", "BTC", "ETH", "XRP", "DOT" ]
-unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE", "DOWN", "BULL", "BEAR"]
+unwanted3 = [ "AUD", "BRL", "EUR", "GBP", "RUB", "TRY", "DAI", "UAH", "VAI", "NGN", "BNB", "BTC", "ETH", "XRP", "DOT", "DAI" ]
+unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE", "DOWN", "BULL", "BEAR", "USDSB"]
 wanted4 = ["USDT"]
 
 open_connections = 0
@@ -67,18 +67,20 @@ async def main():
 
     print(len(tickers))
     for s in tqdm(tickers):
-            if path.isfile(f'./Data/Crypto/{start_date}/{s}.csv'):
-                fileEmpty = stat(f'./Data/Crypto/{start_date}/{s}.csv').st_size == 0
-                if fileEmpty:
-                    asyncio.create_task(get_coin(s))
-                    open_connections += 1
-                    await asyncio.sleep(10)
-            else:
+        if path.isfile(f'./Data/Crypto/{s}.csv'):
+            fileEmpty = stat(f'./Data/Crypto/{s}.csv').st_size == 0
+            if fileEmpty:
                 asyncio.create_task(get_coin(s))
                 open_connections += 1
                 await asyncio.sleep(10)
+        else:
+            asyncio.create_task(get_coin(s))
+            open_connections += 1
+            await asyncio.sleep(10)
 
-    while True:
+        while open_connections >= 10:
+            await asyncio.sleep(1)
+    while open_connections > 0:
         await asyncio.sleep(1)
 
 async def get_coin(s):
@@ -100,7 +102,7 @@ async def get_coin(s):
 def write_coin(s, candles):
     global streams
     # print('start writing')
-    with open(f'./Data/Crypto/{start_date}/{s}.csv', mode='a',newline='') as csv_file:
+    with open(f'./Data/Crypto/{s}.csv', mode='a',newline='') as csv_file:
         writer = csv.writer(csv_file, dialect="unix")
         writer.writerow(["event_time","open", "close", "high", "low","volume"])
         for candle in candles:
