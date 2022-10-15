@@ -43,7 +43,7 @@ API_KEY = ""
 SECRET_KEY = ""
 
 unwanted3 = [ "AUD", "BRL", "EUR", "GBP", "RUB", "TRY", "DAI", "UAH", "VAI", "NGN", "BNB", "BTC", "ETH", "XRP", "DOT", "DAI" ]
-unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE", "DOWN", "BULL", "BEAR", "USDSB"]
+unwanted4 = [ "BUSD", "BIDR", "TUSD", "USDC", "IDRT", "USDP", "DOGE", "DOWN", "BULL", "BEAR", "USDSB", "TUSDT"]
 wanted4 = ["USDT"]
 
 open_connections = 0
@@ -80,7 +80,7 @@ async def main():
 
         while open_connections >= 10:
             await asyncio.sleep(1)
-    while open_connections > 0:
+    while open_connections > 1:
         await asyncio.sleep(1)
 
 async def get_coin(s):
@@ -90,7 +90,7 @@ async def get_coin(s):
     # print(f'get {s}')
     # print(f'open connections: {open_connections}')
     try:
-        candles = await client.get_historical_klines(s, interval = AsyncClient.KLINE_INTERVAL_1MINUTE, start_str = '100000000 minutes ago CET', end_str = '1 minutes ago CET')
+        candles = await client.get_historical_klines(s, interval = AsyncClient.KLINE_INTERVAL_1MINUTE, start_str = '480000 minutes ago CET', end_str = '1 minutes ago CET')
         # print(f'got {s}')
         open_connections -= 1
         # print(f'open connections: {open_connections}')
@@ -106,7 +106,7 @@ def write_coin(s, candles):
         writer = csv.writer(csv_file, dialect="unix")
         writer.writerow(["event_time","open", "close", "high", "low","volume"])
         for candle in candles:
-            event_time = float(candle[0])
+            event_time = int(candle[0])
             # candle_start_time = float(candle[0])
             # candle_close_time = float(candle[6])
             candle_open = float(candle[1])
